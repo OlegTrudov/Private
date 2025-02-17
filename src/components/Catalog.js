@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ShoppingCart } from "lucide-react";
 
 const products = [
   { id: 1, name: "Кашемировое пальто", category: "Пальто", price: 15000, image: "/images/coat.jpg" },
@@ -9,51 +10,61 @@ const products = [
 
 export default function Catalog() {
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [sortOrder, setSortOrder] = useState("asc"); // "asc" - по возрастанию, "desc" - по убыванию
+  const [sortOrder, setSortOrder] = useState("asc");
   const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
 
-  // Фильтруем товары по категории
   const filteredProducts = selectedCategory
     ? products.filter(product => product.category === selectedCategory)
     : products;
 
-  // Сортировка по цене
   const sortedProducts = [...filteredProducts].sort((a, b) =>
     sortOrder === "asc" ? a.price - b.price : b.price - a.price
   );
 
-  // Добавление в корзину
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
-  // Удаление из корзины
   const removeFromCart = (productId) => {
     setCart(cart.filter(item => item.id !== productId));
   };
 
   return (
     <div className="p-4 bg-pink-100 min-h-screen relative">
-      {/* Название магазина */}
       <h1 className="text-4xl font-bold text-fuchsia-600 text-center mb-6">За стилем</h1>
-      
-      {/* Корзина в правом верхнем углу */}
-      <div className="absolute top-4 right-4 bg-white p-4 rounded shadow-md">
-        <h3 className="text-xl font-bold">🛒 Корзина</h3>
-        {cart.length === 0 ? (
-          <p>Корзина пуста</p>
-        ) : (
-          <ul>
-            {cart.map(item => (
-              <li key={item.id} className="flex justify-between border-b py-2">
-                {item.name} - {item.price} ₽
-                <button onClick={() => removeFromCart(item.id)} className="text-red-500">Удалить</button>
-              </li>
-            ))}
-          </ul>
-        )}
+
+      {/* Иконка корзины */}
+      <div className="absolute top-4 right-4 flex items-center">
+        <button onClick={() => setCartOpen(!cartOpen)} className="relative">
+          <ShoppingCart className="w-8 h-8 text-gray-700" />
+          {cart.length > 0 && (
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+              {cart.length}
+            </span>
+          )}
+        </button>
       </div>
-      
+
+      {/* Корзина */}
+      {cartOpen && (
+        <div className="absolute top-12 right-4 bg-white p-4 rounded shadow-md w-72">
+          <h3 className="text-xl font-bold">🛒 Корзина</h3>
+          {cart.length === 0 ? (
+            <p>Корзина пуста</p>
+          ) : (
+            <ul>
+              {cart.map(item => (
+                <li key={item.id} className="flex justify-between border-b py-2">
+                  {item.name} - {item.price} ₽
+                  <button onClick={() => removeFromCart(item.id)} className="text-red-500">Удалить</button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+
       {/* Фильтр по категориям */}
       <div className="flex gap-4 my-4 justify-center">
         <button onClick={() => setSelectedCategory("")} className="px-4 py-2 bg-gray-200 rounded">Все</button>
